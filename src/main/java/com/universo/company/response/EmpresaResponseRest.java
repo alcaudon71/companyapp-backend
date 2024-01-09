@@ -10,7 +10,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 //@EqualsAndHashCode
 @ToString
-public class EmpresaResponseRest {
+public class EmpresaResponseRest extends ResponseRest {
 
 	private EmpresaResponse empresaResponse = new EmpresaResponse();
 	

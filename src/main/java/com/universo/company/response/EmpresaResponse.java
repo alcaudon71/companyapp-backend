@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 public class EmpresaResponse {
 
-	private List<Empresa> empresa;
+	private List<Empresa> empresas;
 	
 }

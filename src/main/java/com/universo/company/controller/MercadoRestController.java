@@ -1,5 +1,8 @@
 package com.universo.company.controller;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.universo.company.entity.Mercado;
 import com.universo.company.response.MercadoResponseRest;
 import com.universo.company.service.IMercadoService;
+import com.universo.company.util.MercadoExcelExporter;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 // CrossOrigin ---> Permite el acceso desde una aplicacion FrontEnd externa a nuestro controlador BackEnd
 // Habilitamos el acceso desde localhost:4200, que es el puerto por defecto utilizado por los FrontEnd de Angular
@@ -23,6 +29,10 @@ import com.universo.company.service.IMercadoService;
 @RequestMapping("/universo/company")
 public class MercadoRestController {
 
+	private static final String EXCEL_CONTENT_TYPE = "application/octet-stream";
+	private static final String EXCEL_HEADER_KEY = "Content-Disposition";
+	private static final String EXCEL_HEADER_VALUE = "attachment; filename=result_mercado.xlsx";
+	
 	@Autowired
 	private IMercadoService service;
 
@@ -106,5 +116,34 @@ public class MercadoRestController {
 		return response;
 		
 	}	
+
+	/**
+	 * Controlador para invocar al servicio de Almacenar mercados en fichero excel
+	 * @param response
+	 * @throws IOException
+	 */
+	@GetMapping("/mercados/export/excel")
+	public void exportToExcel(HttpServletResponse response) throws IOException {
+		
+		// Indicamos el tipo de contenido
+		response.setContentType(EXCEL_CONTENT_TYPE);
+		
+		String headerKey = EXCEL_HEADER_KEY;
+		String headerValue = EXCEL_HEADER_VALUE;  // nombre del archivo excel xml (posterior a 2007)
+		
+		// Establecemos el header con la configuracion establecida
+		response.setHeader(headerKey, headerValue);
+		
+		// Obtenemos la lista de categorias del sistema 
+		ResponseEntity<MercadoResponseRest> mercadosResponse = service.search();
+		
+		List<Mercado> listaMercados = mercadosResponse.getBody().getMercadoResponse().getMercado();
+		
+		// Generamos fichero excel con la lista de mercados
+		MercadoExcelExporter excelExporter = new MercadoExcelExporter(listaMercados);
+		
+		excelExporter.export(response);
+		
+	}
 	
 }
