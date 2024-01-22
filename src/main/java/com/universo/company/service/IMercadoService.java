@@ -11,6 +11,8 @@ public interface IMercadoService {
 	
 	public ResponseEntity<MercadoResponseRest> searchById(Long id);
 	
+	public ResponseEntity<MercadoResponseRest> searchByClave (String cadena);
+	
 	public ResponseEntity<MercadoResponseRest> save(Mercado mercado);
 	
 	public ResponseEntity<MercadoResponseRest> update(Mercado mercado, Long id); 

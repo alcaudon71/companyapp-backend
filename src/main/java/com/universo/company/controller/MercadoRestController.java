@@ -71,6 +71,23 @@ public class MercadoRestController {
 	}
 
 	/**
+	 * Busqueda de Mercados cuya clave contiene una cadena especificada
+	 * @param 	cadena			Cadena por la que se van a filtrar las claves de los mercados
+	 * @return	ResponseEntity	Respuesta con todos los mercados cuya clave contiene la cadena especificada
+	 */
+	@GetMapping("/mercados/filtro/{cadena}")
+	public ResponseEntity<MercadoResponseRest> searchByClave(@PathVariable String cadena) { 
+		
+		System.out.println("search By Clave");
+		
+		// Invocamos al servicio para recuperar el Producto correspondiente a la cadena
+		ResponseEntity<MercadoResponseRest> response = service.searchByClave(cadena);
+		
+		return response;
+		
+	}
+	
+	/**
 	 * Controlador para invocar al servicio de creacion de mercado
 	 * @param 	Mercado			Mercado a crear
 	 * @return	ResponseEntity	Datos del mercado almacenado

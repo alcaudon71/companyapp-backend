@@ -29,6 +29,9 @@ public class MercadoServiceImpl implements IMercadoService {
 	private static final String DESC_MERCADO_OK = "Mercado encontrado";
 	private static final String DESC_MERCADO_NOK = "Mercado no encontrado";
 	private static final String DESC_MERCADO_EXCEP = "Error al consultar por Id";
+	private static final String DESC_MERCADOS_OK = "Mercados encontrados";
+	private static final String DESC_MERCADOS_NOK = "Mercados no encontrados";
+	private static final String DESC_MERCADOS_EXCEP = "Error al recuperar mercados por literal";
 	private static final String DESC_MERCADO_CREADO_OK = "Mercado almacenado";
 	private static final String DESC_MERCADO_CREADO_NOK = "Mercado no almacenado";
 	private static final String DESC_MERCADO_CREADO_EXCEP = "Error al almacenar registro";
@@ -121,6 +124,53 @@ public class MercadoServiceImpl implements IMercadoService {
 		
 	}
 
+	/**
+	 * Busqueda de mercados cuyo nombre contega un literal especificado
+	 * @param 	cadena			Literal por el que se busca en el nombre de los mercados
+	 * @return  ResponseEntity 	Respuesta con la lista de mercados encontrada
+	 */
+	@Override
+	@Transactional (readOnly = true)
+	public ResponseEntity<MercadoResponseRest> searchByClave(String cadena) {
+		// TODO Auto-generated method stub
+		
+		MercadoResponseRest response = new MercadoResponseRest();
+		
+		List<Mercado> list = new ArrayList<>();
+		List<Mercado> listAux = new ArrayList<>();
+		
+		try {
+			
+			// Buscar Mercado por cadena de Nombre
+			listAux = mercadoRepo.findByClaveContainingIgnoreCase(cadena);
+			
+			if (listAux.size() > 0) {
+			
+				// Recorremos la lista recuperando la info de cada mercado con una funcion lambda
+				listAux.stream().forEach( (mercado) -> {
+					list.add(mercado);
+				} );
+
+				// Cargamos la info de la respuesta
+				response.setMetadata(TIPO_RESPUESTA_OK, CODIGO_RESPUESTA_OK, DESC_MERCADOS_OK);
+				response.getMercadoResponse().setMercado(list);
+				
+				
+			} else {
+				response.setMetadata(TIPO_RESPUESTA_NOK, CODIGO_RESPUESTA_NOK, DESC_MERCADOS_NOK);
+				return new ResponseEntity<MercadoResponseRest>(response, HttpStatus.NOT_FOUND);
+			}
+			
+		} catch (Exception e) {
+			e.getStackTrace();
+			response.setMetadata(TIPO_RESPUESTA_NOK, CODIGO_RESPUESTA_NOK, DESC_MERCADOS_EXCEP);
+			return new ResponseEntity<MercadoResponseRest>(response, HttpStatus.INTERNAL_SERVER_ERROR); // error 500
+		}
+		
+		return new ResponseEntity<MercadoResponseRest>(response, HttpStatus.OK); 
+		
+	}
+	
 	/**
 	 * Guardar mercado
 	 */
